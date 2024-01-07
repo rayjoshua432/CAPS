@@ -1,0 +1,47 @@
+{% extends "../base.html" %}
+{% load static %}
+{% block title %}Categories {% endblock %}
+
+{% block content %}
+<div class="album pt-3 bg-white">
+    <div class="container">
+        <h2 class="text-warning py-3">{{ category.name|title }} <span class="text-body">Product</span></h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-4">
+            
+        {% for product in products|slice:":5" %}
+
+        <div class="col">
+            <div>
+                <a class="position-relative" href="{{ product.get_absolute_url }}">
+                    <img class="img-fluid img-thumbnail" alt="Responsive image" style="width: 250px; height: 200px;" src="{{ product.image.url }}">
+                    {% if product.discount >= 1 %}
+                    <img class="position-absolute opacity-75" style="top: -75px; left: 10px;" src="{% static 'discount.svg' %}" alt="">
+                    <img class="position-absolute" style="top: -74px; right: 10px;" src="{% static 'new.svg' %}" alt="">
+                    <span class="position-absolute text-white" style="top: -69px; left: 26px; font-size: 8px;">{{product.discount}}%</span>
+                    {% endif %}
+                </a>
+                <div class="d-flex m-1 justify-content-between position-relative">
+                    <div class="py-1">
+                        <p class="fs-6 m-0 text-truncate"  style="max-width: 200px; white-space: nowrap; overflow: hidden;">{{ product.name }}</p>
+                        {% if product.num_stock <= 5 %}
+                        <span class="text-danger opacity-75" style="font-size: 12px;">Limited Stock</span>
+                        {% else %}
+                        <span class="text-success opacity-75" style="font-size: 12px;">In Stock: {{product.num_stock}}</span>
+                        {% endif %}
+                        <p class="text-decoration-line-through m-0 text-muted" style="font-size: 13px;">₱{{ product.formatted_price }}</p>
+                        <p class="fs-6 m-0">₱{{ product.formatted_discounted_price }}</p>
+                    </div>
+                    <div class="position-absolute bottom-0 end-0">
+                        <a class="align-self-end" href="">
+                            <img src="{% static 'add.svg' %}" alt="">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "../base.html" %}
+{% load static %}
+{% block title %}{{ product.name}}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div>
+        <div class="my-3 mx-2">
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb text-decoration-none">
+            <li class="breadcrumb-item"><a class="text-decoration-none text-body" href="/">Home</a></li>
+            <li class="breadcrumb-item"><a class="text-decoration-none text-body" href="/search/{{ product.category|lower }}">{{ product.category }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            </ol>
+            </nav>
+        </div>
+
+        <div class="my-3 mx-2 bg-light rounded container d-flex flex-row">
+            <div class="d-flex flex-column" style="height: 93%;">
+                <div class="ps-2 pt-3">
+                    <img class="img-thumbnail" style="width: 430px; height: 350px;" src="{{ product.image.url }}" alt="">
+                </div>
+                <div class="d-flex my-1 p-2" style="gap: 10px;">
+                    <img class="img-thumbnail" style="width: 100px; height: 100px;" src="{{ product.image.url }}" alt="">
+                    <img class="img-thumbnail" style="width: 100px; height: 100px;" src="{{ product.image.url }}" alt="">
+                    <img class="img-thumbnail" style="width: 100px; height: 100px;" src="{{ product.image.url }}" alt="">
+                    <img class="img-thumbnail" style="width: 100px; height: 100px;" src="{{ product.image.url }}" alt="">
+                </div>
+            </div>
+            <div class="">
+                <div class="card m-3" style="width: 600px; height: 93%;">
+                    <div class="card-body">
+                        <p class="text-success text-capitalize fs-5 m-0">{{ product.name }}</p>
+                        <p class="text-body" style="font-size: 14px;">{{ product.created_by }}</p>
+                        <p class="fs-4 m-0 text-warning fw-bolder">₱{{ product.discounted_price }}</p>
+                        <span class="text-muted text-decoration-line-through">₱{{ product.formatted_price }}</span>
+                        {% if product.discount != 0 %}
+                            <span>{{ product.discount }}% off</span>
+                        {% endif %}
+                        <hr>
+                        <div class="row" style="gap: 24px; width: 100%;">
+                            <p class="col text-muted">Product Description</p>
+                            <p class="col">{{ product.description }}</p>
+                        </div>
+                        <div class="row" style="gap: 24px; width: 100%;">
+                            <p class="col text-muted">Number of Stock</p>
+                            <p class="col">{{ product.num_stock }} available</p>
+                        </div>
+                        <div class="row" style="gap: 24px; width: 100%;">
+                            <p class="col text-muted">Quantity</p>
+                            <p class="col">
+                                <button class="btn btn-outline-warning rounded text-center p-0" style="height: 30px; width: 30px;" onclick="decreaseQuantity()">-</button>
+                                <input style="border: none; width: 20px; text-align: center;" type="text" name="quantity" id="quantity" min="1" max="{{ product.num_stock }}" value="1" class="mx-2">
+                                <button class="btn btn-outline-warning rounded text-center p-0" style="height: 30px; width: 30px;" onclick="increaseQuantity()">+</button>
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <button id="add-to-cart-button" value="{{ product.id }}" type="button" class="btn btn-light border-2 border-warning text-warning px-5"><img class="" style="height:24px; padding-right: 10px;" src="{% static 'cart.svg' %}" alt=""> Add to Cart</button>
+                            <button type="button" class="btn btn-warning btn-lg px-5 text-white" style="font-size: 16px; width: 250px;">Buy Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function increaseQuantity() {
+        var quantityInput = document.getElementById("quantity");
+        var maxStock = parseInt(quantityInput.getAttribute("max"));
+        var currentValue = parseInt(quantityInput.value);
+        if (currentValue < maxStock) {
+            quantityInput.value = currentValue + 1;
+        }
+    }
+
+    function decreaseQuantity() {
+        var quantityInput = document.getElementById("quantity");
+        var currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    }
+
+    $(document).on('click', '#add-to-cart-button', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url "basket:basket_add" %}',
+            data: {
+                productid: $('#add-to-cart-button').val(),
+                productqty: $('#quantity').val(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'post'
+            },
+            success: function (json) {
+                document.getElementById("basket-qty").innerHTML = json.qty
+            },
+            error: function (xhr, errmsg, err) {}
+        });
+    })
+</script>
+
+
+{% endblock %}

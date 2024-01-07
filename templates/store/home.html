@@ -1,0 +1,150 @@
+{% extends "./base.html" %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <section class="pt-0 text-center container">
+        <div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active" data-bs-interval="10000">
+                    <img src="{% static 'banner01.png' %}" class="d-block w-100" alt="...">
+                    <div class="carousel-caption d-none d-md-block">
+                        <div class="bg-light bg-opacity-75 p-3 border border-warning rounded">
+                            <p class="muted">Welcome to Farmstock Davao, the premier e-commerce platform where buyers and sellers come together to create a vibrant online marketplace. With a world of possibilities at your fingertips, our platform offers an unparalleled shopping experience.</p>
+                            <a href="#" class="btn btn-warning my-2 me-2 text-white">Browse a Product</a>
+                            <a href="#" class="btn btn-light my-2" style="border: 1px solid black;">Join with us!</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item" data-bs-interval="5000">
+                    <img src="{% static 'banner02.jpg' %}" class="d-block w-100" alt="...">
+                    <div class="carousel-caption d-none d-md-block">
+                        <div class="bg-light bg-opacity-75 p-3 border border-warning rounded">
+                            <p>From our farm to your table, savor the exceptional quality of our free-range, healthy, and affordable livestock pigs. Shop with us and experience the difference in every delicious bite!</p>
+                            <a href="#" class="btn btn-warning my-2 me-2">Shop now!</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item" data-bs-interval="5000">
+                    <img src="{% static 'banner03.jpg' %}" class="d-block w-100" alt="...">
+                    <div class="carousel-caption d-none d-md-block">
+                        <div class="bg-light bg-opacity-75 p-3 border border-warning rounded">
+                            <p>Discover the exceptional flavor of our free-range, healthy, and affordable chickens. When you choose us, you're selecting poultry that's raised in harmony with nature. Enjoy a delectable, guilt-free meal - shop now and taste the difference!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </section>
+    
+    <div class="container pt-4">
+        <h2>Browse our <span class="text-warning">Top Categories</span></h2>
+        <div class="card-group pt-4 d-flex " style="gap:16px;">
+            {% for category in product_category %}
+                <a href="{{ category.get_absolute_url }}" class="card d-flex justify-content-center align-items-center bg-warning bg-opacity-25 border-white rounded" style="width: 120px; height: 160px; text-decoration: none;">
+                    <img class="text-center" style="width: 80px; height: 50px;" src="{{ category.icon.url }}" class="card-img-top" alt="...">
+                    <h5 class="card-title text-body pt-2">{{ category.name }}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            {% if category.num_products == 0 %}
+                                No item
+                            {% elif category.num_products == 1 %}
+                                1 item
+                            {% else %}
+                                {{ category.num_products }} items
+                            {% endif %}
+                        </small>
+                    </p>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+
+
+    <div class="album pt-3 bg-white">
+        <div class="container">
+            <h2 class="text-warning py-3">Newly Arrived <span class="text-body">Products</span></h2>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-4">
+
+            {% for product in products|slice:":5" %}
+
+            <div class="col">
+                <div>
+                    <a class="position-relative" href="{{ product.get_absolute_url }}">
+                        <img class="img-fluid img-thumbnail" alt="Responsive image" style="width: 250px; height: 200px;" src="{{ product.image.url }}">
+                        <img class="position-absolute" style="top: -74px; right: 10px;" src="{% static 'new.svg' %}" alt="">
+                        {% if product.discount >= 1 %}
+                        <img class="position-absolute opacity-75" style="top: -75px; left: 10px;" src="{% static 'discount.svg' %}" alt="">
+                        <span class="position-absolute text-white" style="top: -69px; left: 26px; font-size: 8px;">{{product.discount}}%</span>
+                        {% endif %}
+                    </a>
+                    <div class="d-flex m-1 justify-content-between position-relative">
+                        <div class="py-1">
+                            <p class="fs-6 m-0 text-truncate"  style="max-width: 200px; white-space: nowrap; overflow: hidden;">{{ product.name }}</p>
+                            {% if product.num_stock <= 5 %}
+                            <span class="text-danger opacity-75" style="font-size: 12px;">Limited Stock</span>
+                            {% else %}
+                            <span class="text-success opacity-75" style="font-size: 12px;">In Stock: {{product.num_stock}}</span>
+                            {% endif %}
+                            <p class="text-decoration-line-through m-0 text-muted" style="font-size: 13px;">₱{{ product.formatted_price }}</p>
+                            <p class="fs-6 m-0">₱{{ product.discounted_price }}</p>
+                        </div>
+                    </div>
+                </div>
+            </diidv>
+
+        {% endfor %}
+
+        </div>
+    </div>
+
+    <div class="album pt-3 bg-white">
+        <div class="container">
+            <h2 class="text-warning py-3">Hot Deals <span class="text-body">Products</span></h2>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-4">
+                {% for product in products %}
+                    {% if product.discount >= 50 %}
+                        <div class="col">
+                            <div>
+                                <a class="position-relative" href="{{ product.get_absolute_url }}">
+                                    <img class="img-fluid img-thumbnail" alt="Responsive image" style="width: 250px; height: 200px;" src="{{ product.image.url }}">
+                                    {% if product.discount >= 1 %}
+                                        <img class="position-absolute opacity-75" style="top: -75px; left: 10px;" src="{% static 'discount.svg' %}" alt="">
+                                        <span class="position-absolute text-white" style="top: -69px; left: 26px; font-size: 8px;">{{ product.discount }}%</span>
+                                    {% endif %}
+                                </a>
+                                <div class="d-flex m-1 justify-content-between position-relative">
+                                    <div class="py-1">
+                                        <p class="fs-6 m-0 text-truncate" style="max-width: 200px; white-space: nowrap; overflow: hidden;">{{ product.name }}</p>
+                                        {% if product.num_stock <= 5 %}
+                                            <span class="text-danger opacity-75" style="font-size: 12px;">Limited Stock</span>
+                                        {% else %}
+                                            <span class="text-success opacity-75" style="font-size: 12px;">In Stock: {{ product.num_stock }}</span>
+                                        {% endif %}
+                                        <p class="text-decoration-line-through m-0 text-muted" style="font-size: 13px;">₱{{ product.formatted_price }}</p>
+                                        <p class="fs-6 m-0">₱{{ product.formatted_discounted_price }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
